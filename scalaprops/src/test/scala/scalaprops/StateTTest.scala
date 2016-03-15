@@ -3,6 +3,7 @@ package scalaprops
 import scalaz._
 import scalaz.std.tuple._
 import scalaz.std.anyVal._
+import scalaz.std.either._
 import FunctionEqual._
 
 object StateTTest extends Scalaprops {
@@ -40,6 +41,11 @@ object StateTTest extends Scalaprops {
       scalazlaws.bindRec.all[F],
       scalazlaws.equal.all[F[Int]]
     )
+  }
+
+  val monadError = {
+    type F[A] = StateT[({type l[a] = Either[Int, a]})#l, Int, A]
+    scalazlaws.monadError.all[F, Int]
   }
 
   val tree = {

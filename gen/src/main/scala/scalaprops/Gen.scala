@@ -342,9 +342,9 @@ object Gen extends GenInstances0 {
       type F[a] = State[Rand, a]
       private[this] val F = Kleisli.kleisliBindRec[F, Int]
 
-      override def tailrecM[A, B](f: A => Gen[A \/ B])(a: A): Gen[B] = {
+      override def tailrecM[A, B](a: A)(f: A => Gen[A \/ B]): Gen[B] = {
         val g = f.andThen(_.toReaderState)
-        Gen.isoReaderState.from(F.tailrecM(g)(a))
+        Gen.isoReaderState.from(F.tailrecM(a)(g))
       }
     }
 
@@ -771,7 +771,7 @@ object Gen extends GenInstances0 {
     Gen.oneOf(
       Gen.value(Dequeue.empty[A]),
       A.map(Dequeue.apply(_)),
-      Apply[Gen].apply2(Gen[NonEmptyIList[A]], Gen[NonEmptyIList[A]])(
+      Apply[Gen].apply2(Gen[NonEmptyList[A]], Gen[NonEmptyList[A]])(
         (x, y) => Dequeue.fromFoldable(x) ++ Dequeue.fromFoldable(y)
       )
     )
@@ -834,7 +834,7 @@ object Gen extends GenInstances0 {
       Apply[Gen].apply2(A, B)(\&/.Both.apply)
     )
 
-  implicit def listTGen[F[_], A](implicit F: Gen[F[List[A]]]): Gen[ListT[F, A]] =
+  implicit def listTGen[F[_], A](implicit F: Gen[F[IList[A]]]): Gen[ListT[F, A]] =
     F.map(ListT.apply(_))
 
   implicit def dlistGen[A: Gen]: Gen[DList[A]] =
@@ -931,7 +931,7 @@ object Gen extends GenInstances0 {
   implicit def contravariantCoyonedaGen[F[_], A](implicit F: Gen[F[A]]): Gen[ContravariantCoyoneda[F, A]] =
     F.map(ContravariantCoyoneda.lift)
 
-  implicit def fingerGen[V, A](implicit A: Gen[A], R: Reducer[A, V]): Gen[Finger[V, A]] =
+  implicit def fingerGen[V: Monoid, A](implicit A: Gen[A], R: Reducer[A, V]): Gen[FingerTree.Finger[V, A]] =
     Gen.oneOf(
       A.map(FingerTree.one[V, A]),
       Apply[Gen].apply2(A, A)(FingerTree.two[V, A]),

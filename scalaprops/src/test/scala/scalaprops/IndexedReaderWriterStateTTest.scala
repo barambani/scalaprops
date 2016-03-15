@@ -2,6 +2,7 @@ package scalaprops
 
 import scalaz._
 import scalaz.std.anyVal._
+import scalaz.std.either._
 import scalaz.std.tuple._
 import FunctionEqual._
 
@@ -48,6 +49,11 @@ object IndexedReaderWriterStateTTest extends Scalaprops {
       scalazlaws.monad.all[F],
       scalazlaws.plus.all[F]
     )
+  }
+
+  val monadError = {
+    type F[A] = RWST[({type l[a] = Either[Int, a]})#l, Int, Int, Int, A]
+    scalazlaws.monadError.all[F, Int]
   }
 
   val monadTrans = scalazlaws.monadTrans.all[({type l[f[_], a] = ReaderWriterStateT[f, Int, Int, Int, a]})#l]

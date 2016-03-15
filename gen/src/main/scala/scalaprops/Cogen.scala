@@ -422,7 +422,7 @@ object Cogen extends CogenInstances0 {
     val ec = scala.concurrent.ExecutionContext.global
     cogenDisjunction(Divisible[Cogen].conquer[Throwable], F).contramap(f =>
       Await.result(
-        f.map(\/.right)(ec).recover{ case e => -\/(e) }(ec),
+        f.map(\/.right[Throwable, A])(ec).recover{ case e => -\/[Throwable, A](e) }(ec),
         5.seconds
       )
     )
@@ -529,9 +529,9 @@ object Cogen extends CogenInstances0 {
         def cogen[X](a: Any, g: CogenState[X]) = g
       }
       def conquer[A] = empty.asInstanceOf[Cogen[A]]
-      def contramap[A, B](r: Cogen[A])(f: B => A) =
+      override def contramap[A, B](r: Cogen[A])(f: B => A) =
         r contramap f
-      def divide[A, B, C](fa: Cogen[A], fb: Cogen[B])(f: C => (A, B)) =
+      def divide2[A, B, C](fa: => Cogen[A], fb: => Cogen[B])(f: C => (A, B)) =
         new Cogen[C] {
           def cogen[X](c: C, g: CogenState[X]) = {
             val t = f(c)

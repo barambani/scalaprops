@@ -2,6 +2,7 @@ package scalaprops
 
 import scalaz.std.option._
 import scalaz.std.anyVal._
+import scalaz.ISet
 
 object OptionTest extends Scalaprops {
 
@@ -16,4 +17,9 @@ object OptionTest extends Scalaprops {
       scalazlaws.cobind.all[Option]
     )
 
+  val test2 =
+    Properties.list(
+      scalazlaws.monoid.all[Option[Int]],
+      scalazlaws.semilattice.all[Option[ISet[Int]]]
+    )
 }

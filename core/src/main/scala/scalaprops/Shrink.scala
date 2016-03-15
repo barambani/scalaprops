@@ -65,8 +65,8 @@ object Shrink {
 
   implicit def disjunction[A, B](implicit A: Shrink[A], B: Shrink[B]): Shrink[A \/ B] =
     shrink{
-      case -\/(a) => A(a).map(\/.left)
-      case \/-(a) => B(a).map(\/.right)
+      case -\/(a) => A(a).map(\/.left[A, B])
+      case \/-(a) => B(a).map(\/.right[A, B])
     }
 
   implicit def either[A: Shrink, B: Shrink]: Shrink[A Either B] =
