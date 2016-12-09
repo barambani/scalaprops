@@ -55,8 +55,7 @@ def module(id: String): CrossProject =
 lazy val gen = module("gen")
   .settings(
     name := genName,
-    description := "pure functional random value generator",
-    libraryDependencies += "org.scalaz" %%% "scalaz-core" % scalazVersion.value
+    description := "pure functional random value generator"
   )
   .platformsSettings(JSPlatform, NativePlatform)(
     unmanagedSourceDirectories in Compile += {
@@ -259,10 +258,11 @@ lazy val nativeProjects = Seq[ProjectReference](
   scalapropsNative,
   scalazlawsNative
 )
+lazy val scalazSnapshotURI = uri("git://github.com/scalaz/scalaz#series/7.2.x")
 
-lazy val genJS = gen.js
-lazy val genJVM = gen.jvm
-lazy val genNative = gen.native
+lazy val genJS = gen.js.dependsOn(ProjectRef(scalazSnapshotURI, "coreJS"))
+lazy val genJVM = gen.jvm.dependsOn(ProjectRef(scalazSnapshotURI, "coreJVM"))
+lazy val genNative = gen.native.dependsOn(ProjectRef(scalazSnapshotURI, "coreNative"))
 lazy val genRoot = project
   .aggregate(genJS, genJVM, genNative)
   .settings(
