@@ -101,7 +101,14 @@ lazy val scalaprops = module(scalapropsName)
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0"
   )
   .platformsSettings(JVMPlatform, NativePlatform)(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v <= 12 =>
+          Seq("org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided")
+        case _ =>
+          Nil
+      }
+    }
   )
   .jsSettings(
     libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
@@ -217,6 +224,7 @@ val commonSettings = _root_.scalaprops.ScalapropsPlugin.autoImport.scalapropsCor
     ),
     SetScala211,
     releaseStepCommand("rootNative/publishSigned"),
+    releaseStepCommandAndRemaining("; ++ 2.13.0-M4-pre-20d3c21 ; rootJVM/publishSigned"),
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),

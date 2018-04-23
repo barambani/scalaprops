@@ -4,7 +4,6 @@ scala:
   - 2.10.7
   - 2.11.12
   - 2.12.6
-  - 2.13.0-M3
 
 cache:
   directories:
@@ -41,6 +40,9 @@ matrix:
       - wget https://raw.githubusercontent.com/paulp/sbt-extras/3c8fcadc3376e/sbt && chmod +x ./sbt
       script:
       - ./sbt -J-Xmx5G rootNative/compile scalapropsNative/test
+    - scala: 2.13.0-M4-pre-20d3c21
+      script:
+      - sbt ++$TRAVIS_SCALA_VERSION scalapropsJVM/test
     - scala: 2.12.6
       jdk: oraclejdk9
       script:
