@@ -137,7 +137,20 @@ def stripPom(filter: scala.xml.Node => Boolean): Setting[_] =
     new RuleTransformer(rule).transform(node)(0)
   }
 
-val commonSettings = _root_.scalaprops.ScalapropsPlugin.autoImport.scalapropsCoreSettings ++ Seq(
+val commonSettings = _root_.scalaprops.ScalapropsPlugin.autoImport.scalapropsCoreSettings ++ Def.settings(
+  Seq(Compile).map { scope =>
+    val scalaV = 13
+    val dir = Defaults.nameForSrc(scope.name)
+    unmanagedSourceDirectories in scope += {
+      val base = CustomCrossType.shared(baseDirectory.value, dir).getParentFile
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= scalaV && scalaVersion.value != "2.13.0-M3" =>
+          base / s"scala-2.${scalaV}+"
+        case _ =>
+          base / s"scala-2.${scalaV}-"
+      }
+    }
+  },
   unmanagedResources in Compile += (baseDirectory in LocalRootProject).value / "LICENSE.txt",
   resolvers += Opts.resolver.sonatypeReleases,
   publishTo := Some(
