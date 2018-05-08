@@ -32,6 +32,13 @@ env:
 
 matrix:
   include:
+    - scala: 2.13.0-M4-pre-20d3c21
+      script:
+      - git clone -b v0.9.6 https://github.com/non/kind-projector.git
+      - cd kind-projector
+      - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
+      - cd ..
+      - sbt "++${TRAVIS_SCALA_VERSION}" checkGenerateCodeError scalapropsJVM/test
     - scala: SCALA_NATIVE
       jdk: oraclejdk8
       sudo: required
