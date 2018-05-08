@@ -227,11 +227,11 @@ object GenTest extends Scalaprops {
 
     Properties.list(
       test1(IList(true, false), "Boolean"),
-      test1(orderingValues, "Ordering"),
+      test1(orderingValues, "Ordering").andThenParam(Param.minSuccessful(20)),
       test(IList(true, false), IList(Maybe.just(true), Maybe.just(false), Maybe.empty[Boolean]), "Boolean => Maybe[Boolean]"),
       test(IList(true, false), orderingValues, "Boolean => Ordering"),
-      test(orderingValues, IList(true, false), "Ordering => Boolean"),
-      test(IList(Maybe.just(true), Maybe.just(false), Maybe.empty[Boolean]), IList(true, false), "Maybe[Boolean] => Boolean"),
+      test(orderingValues, IList(true, false), "Ordering => Boolean").andThenParam(Param.minSuccessful(20)),
+      test(IList(Maybe.just(true), Maybe.just(false), Maybe.empty[Boolean]), IList(true, false), "Maybe[Boolean] => Boolean").andThenParam(Param.minSuccessful(20)),
       test1(IList(Maybe.just(true), Maybe.just(false), Maybe.empty[Boolean]), "Maybe[Boolean]", 100000).andThenParam(Param.minSuccessful(3)),
       test1(IList(true, false).flatMap(a => IList(\/.right(a), \/.left(a))), """Boolean \/ Boolean""", 50000).andThenParam(Param.minSuccessful(3))
     )
